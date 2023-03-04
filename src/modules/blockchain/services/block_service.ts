@@ -43,7 +43,10 @@ export class BlockService {
   }
 
   /**
-   * return the block for the given block number
+   * return the block for the given block number using block
+   * duration averaging solution
+   *
+   * this is a private method
    *
    * @param {ethers.providers.Block} block
    * @param {number} timestamp
@@ -100,6 +103,18 @@ export class BlockService {
     }
   }
 
+  /**
+   * return the block for the given block number using binary
+   * search algorithm.
+   *
+   * this is a private method
+   *
+   * @param {BigNumber} lowestBlock
+   * @param {BigNumber} highestBlock
+   * @param {number} timestamp
+   * @param {number} nbLookup
+   * @return {{height: number, nbLookup: number}}
+   */
   private async lookingForBlockBisect(
     lowestBlock: BigNumber,
     highestBlock: BigNumber,
@@ -133,6 +148,13 @@ export class BlockService {
     }
   }
 
+  /**
+   * boiler plate for lookingForBlockAvg
+   *
+   * @param {number} timestamp
+   * @return {{height: number, nbLookup: number}}
+   *
+   */
   async findBlockByTimeAverage(timestamp: number): Promise<{ height: number; nbLookup: number }> {
     if (timestamp >= Date.now()) {
       return { height: await this.getHeight(), nbLookup: 0 };
@@ -141,6 +163,13 @@ export class BlockService {
     return this.lookingForBlockAvg(await this.getBlock(await this.getHeight()), timestamp, new BigNumber(AVG_BLOCK_TIME), 1);
   }
 
+  /**
+   * boiler plate for lookingForBlockBisect
+   *
+   * @param {number} timestamp
+   * @return {{height: number, nbLookup: number}}
+   *
+   */
   async findBlockByTimestampBisect(timestamp: number): Promise<{ height: number; nbLookup: number }> {
     if (timestamp >= Date.now()) {
       return { height: await this.getHeight(), nbLookup: 0 };

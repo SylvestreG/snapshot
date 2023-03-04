@@ -1,5 +1,10 @@
 import * as validate from 'validate';
 
+/**
+ * Validate the input for
+ * POST /block/by-timestamp
+ *
+ */
 export const blockTimestampValidator = new validate({
   timestamp: {
     type: Number,
