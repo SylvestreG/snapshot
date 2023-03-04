@@ -9,6 +9,11 @@ interface BlockByTimestampParams {
   method?: 'BINARY_SEARCH' | 'AVG_BLOCK_TIME';
 }
 
+interface ErrorMessage {
+  message: string;
+  code: number;
+}
+
 /**
  * Controller for /block routes
  *
@@ -17,6 +22,24 @@ export class BlockController {
   private service: BlockService;
   constructor() {
     this.service = new BlockService();
+  }
+
+  /**
+   * check validity of block param
+   *
+   * @param {string | undefined} block - input to validate
+   *
+   */
+  private async checkBlockHelper(block: string | undefined): Promise<ErrorMessage | undefined> {
+    if (!block) {
+      return { message: 'missing params', code: 400 };
+    }
+
+    if (isNaN(+block) || +block < 0 || +block > (await this.service.getHeight())) {
+      return { message: 'Error: invalid Block.', code: 400 };
+    }
+
+    return undefined;
   }
 
   /**
@@ -39,6 +62,12 @@ export class BlockController {
    *
    */
   getTimestampForBlock = async (req: Request, res: Response) => {
+    const error = await this.checkBlockHelper(req.params.blockHeight);
+    if (error) {
+      res.status(400).send(error);
+      return;
+    }
+
     const block = await this.service.getBlock(+req.params.blockHeight);
 
     res.send(new TimestampTransformer(block.timestamp).transform());
@@ -52,10 +81,12 @@ export class BlockController {
    *
    */
   blockByHeight = async (req: Request, res: Response) => {
-    if (!req.params.blockHeight) {
-      res.status(400).send({ message: 'missing params', code: 400 });
+    const error = await this.checkBlockHelper(req.params.blockHeight);
+    if (error) {
+      res.status(400).send(error);
       return;
     }
+
     const block = await this.service.getBlock(+req.params.blockHeight);
     res.send(new BlockTransformer(block).transform());
   };
