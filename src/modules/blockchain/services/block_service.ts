@@ -1,6 +1,7 @@
 import { ethers } from 'ethers';
 import BigNumber from 'bignumber.js';
 import { logger } from 'core/logger/logger';
+import { Cached } from '../../../core/cache';
 
 const AVG_BLOCK_TIME = 13;
 
@@ -10,9 +11,18 @@ const AVG_BLOCK_TIME = 13;
  */
 export class BlockService {
   private client: ethers.providers.BaseProvider;
+  private saveHeight: number;
+  private saveTimestamp: number;
 
   constructor() {
     this.client = new ethers.providers.JsonRpcProvider('https://virginia.rpc.blxrbdn.com');
+    this.saveHeight = 0;
+    this.saveTimestamp = 0;
+  }
+
+  async updateHeight() {
+    this.saveHeight = await this.getHeight();
+    this.saveTimestamp = (await this.getBlock(this.saveHeight)).timestamp;
   }
 
   /**
@@ -28,6 +38,7 @@ export class BlockService {
    * @param {number} block
    * @return {ethers.providers.Block}
    */
+  @Cached({ ttl: 86400 })
   async getBlock(block: number): Promise<ethers.providers.Block> {
     return this.client.getBlock(block);
   }
@@ -82,7 +93,7 @@ export class BlockService {
       newBlockNumber = block.number + deltaBlock;
     }
 
-    const newBlock = await this.client.getBlock(newBlockNumber);
+    const newBlock = await this.getBlock(newBlockNumber);
     avgTime = this.findAvgTime(block, newBlock);
     logger.debug('new block ', newBlockNumber, '( ', avgTime.toString(), 's/block)');
 
@@ -126,7 +137,7 @@ export class BlockService {
     const newHeight = lowestBlock.plus(delta);
     nbLookup += 1;
 
-    const block = await this.client.getBlock(newHeight.toNumber());
+    const block = await this.getBlock(newHeight.toNumber());
     if (!newHeight.eq(lowestBlock) && !newHeight.eq(highestBlock)) {
       if (block.timestamp > timestamp) {
         return await this.lookingForBlockBisect(lowestBlock, newHeight, timestamp, nbLookup);
@@ -156,7 +167,7 @@ export class BlockService {
    *
    */
   async findBlockByTimeAverage(timestamp: number): Promise<{ height: number; nbLookup: number }> {
-    if (timestamp >= Date.now()) {
+    if (timestamp >= (Date.now() / 1000)) {
       return { height: await this.getHeight(), nbLookup: 0 };
     }
 
@@ -171,10 +182,18 @@ export class BlockService {
    *
    */
   async findBlockByTimestampBisect(timestamp: number): Promise<{ height: number; nbLookup: number }> {
-    if (timestamp >= Date.now()) {
+    if (timestamp >= (Date.now() / 1000)) {
       return { height: await this.getHeight(), nbLookup: 0 };
     }
 
-    return this.lookingForBlockBisect(new BigNumber(1), new BigNumber(await this.getHeight()), timestamp);
+    // try to use some of the cached block wen possible.
+    // for that we store a timestamp and if the wanted
+    // timestamp is under this value we start from here.
+    if (timestamp <= this.saveTimestamp) {
+      return this.lookingForBlockBisect(new BigNumber(1), new BigNumber(this.saveHeight), timestamp);
+    }
+
+    // if the value is bigger, we start from save timestamp to new timestamp
+    return this.lookingForBlockBisect(new BigNumber(this.saveHeight), new BigNumber(await this.getHeight()), timestamp);
   }
 }

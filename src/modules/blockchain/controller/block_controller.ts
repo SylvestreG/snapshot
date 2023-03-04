@@ -24,6 +24,10 @@ export class BlockController {
     this.service = new BlockService();
   }
 
+  async setupController() {
+    await this.service.updateHeight();
+  }
+
   /**
    * check validity of block param
    *
@@ -121,3 +125,4 @@ export class BlockController {
 }
 
 export const blockController = new BlockController();
+blockController.setupController();
