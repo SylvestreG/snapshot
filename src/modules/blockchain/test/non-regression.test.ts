@@ -18,7 +18,7 @@ describe('blockchain » block » non-regress', () => {
       });
   });
 
-  it('Get block by bisect for ts ', async () => {
+  it('Get block by avg for ts ', async () => {
     const app = await getApp(true);
     await request(app)
       .post('/block/by-timestamp')

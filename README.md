@@ -193,3 +193,37 @@ $ nodemon --watch 'src/**/*' -e ts,tsx --exec 'NODE_PATH=./src ts-node --files' 
 [nodemon] starting `NODE_PATH=./src ts-node --files ./src/server.ts`
 2023-03-04 09:42:35.953 INFO    /src/server.ts:14       Listen on port 3000
 ```
+
+### yarn test
+
+##### Purpose
+Launch the test suite
+
+##### Usage
+```bash
+➜  snapshot git:(master) ✗ yarn test
+yarn run v1.22.19
+$ NODE_PATH=./src jest
+ PASS  src/modules/blockchain/test/block.test.ts
+  blockchain » block
+    ✓ Last height work (890 ms)
+    ✓ Get Block works (582 ms)
+    ✓ Get Invalid Block (1 ms)
+    ✓ Get Invalid Block number negative (2 ms)
+    ✓ Get Invalid Block number too big (466 ms)
+    ✓ Get Block timestamp works (853 ms)
+    ✓ trying without timestamp (17 ms)
+    ✓ trying with wrong method (3 ms)
+
+ PASS  src/modules/blockchain/test/non-regression.test.ts (13.636 s)
+  blockchain » block » non-regress
+    ✓ Get block by bisect for avg  (8198 ms)
+    ✓ Get block by bisect for ts  (4132 ms)
+
+Test Suites: 2 passed, 2 total
+Tests:       10 passed, 10 total
+Snapshots:   0 total
+Time:        13.808 s, estimated 16 s
+Ran all test suites.
+✨  Done in 14.33s.
+```
