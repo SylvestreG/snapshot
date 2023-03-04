@@ -10,7 +10,7 @@ export const blockTimestampValidator = new validate({
     type: Number,
     required: true,
     use: {
-      statusEnum: (val: number) => val > 0 && val <= Date.now(),
+      statusEnum: (val: number) => val > 0 && val <= (Date.now() / 1000),
     },
   },
   method: {
