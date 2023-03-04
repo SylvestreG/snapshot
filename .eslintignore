@@ -1,9 +1,3 @@
-dist/
-database/dist
-database/migrations
-src/database/migrations
-config/
 .eslintrc*
 jest.config*
-ormconfig*
-doc-api/*
+src/@types

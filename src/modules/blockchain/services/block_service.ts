@@ -19,7 +19,7 @@ export class BlockService {
    * @return {number} last block Number
    */
   async getHeight(): Promise<number> {
-    return this.client.getBlockNumber();
+    return await this.client.getBlockNumber();
   }
 
   /**
