@@ -56,6 +56,19 @@ describe('blockchain » block', () => {
       });
   });
 
+  it('Get Invalid Block number 0', async () => {
+    const app = await getApp(true);
+    await request(app)
+      .get('/block/0')
+      .send()
+      .expect(400)
+      .then(async (response: supertest.Response) => {
+        const body: { code: number; message: string } = JSON.parse(response.text);
+        expect(body.code).toBe(400);
+        expect(body.message).toBe('Error: invalid Block.');
+      });
+  });
+
   it('Get Invalid Block number too big', async () => {
     const app = await getApp(true);
     await request(app)
@@ -105,6 +118,19 @@ describe('blockchain » block', () => {
         const body: { code: number; message: string } = JSON.parse(response.text);
         expect(body.code).toBe(400);
         expect(body.message).toBe('Error: method must be either BINARY_SEARCH or AVG_BLOCK_TIME.');
+      });
+  });
+
+  it('trying with timestamp too low', async () => {
+    const app = await getApp(true);
+    await request(app)
+      .post('/block/by-timestamp')
+      .send({ timestamp: 2 })
+      .expect(400)
+      .then(async (response: supertest.Response) => {
+        const body: { code: number; message: string } = JSON.parse(response.text);
+        expect(body.code).toBe(400);
+        expect(body.message).toBe('Error: timestamp before block 1.');
       });
   });
 });

@@ -167,7 +167,7 @@ export class BlockService {
    *
    */
   async findBlockByTimeAverage(timestamp: number): Promise<{ height: number; nbLookup: number }> {
-    if (timestamp >= (Date.now() / 1000)) {
+    if (timestamp >= Date.now() / 1000) {
       return { height: await this.getHeight(), nbLookup: 0 };
     }
 
@@ -182,7 +182,7 @@ export class BlockService {
    *
    */
   async findBlockByTimestampBisect(timestamp: number): Promise<{ height: number; nbLookup: number }> {
-    if (timestamp >= (Date.now() / 1000)) {
+    if (timestamp >= Date.now() / 1000) {
       return { height: await this.getHeight(), nbLookup: 0 };
     }
 

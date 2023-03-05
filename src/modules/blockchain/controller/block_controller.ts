@@ -4,6 +4,8 @@ import { BlockService } from '../services/block_service';
 import { TimestampTransformer } from '../transformer/timestamp_transformer';
 import { BlockTransformer } from '../transformer/block_transformer';
 
+const FIRST_BLOCK_TIMESTAMP = 1438269988;
+
 interface BlockByTimestampParams {
   timestamp: number;
   method?: 'BINARY_SEARCH' | 'AVG_BLOCK_TIME';
@@ -39,7 +41,7 @@ export class BlockController {
       return { message: 'missing params', code: 400 };
     }
 
-    if (isNaN(+block) || +block < 0 || +block > (await this.service.getHeight())) {
+    if (isNaN(+block) || +block <= 0 || +block > (await this.service.getHeight())) {
       return { message: 'Error: invalid Block.', code: 400 };
     }
 
@@ -109,6 +111,14 @@ export class BlockController {
       return;
     }
     const params: BlockByTimestampParams = req.body;
+
+    if (params.timestamp < FIRST_BLOCK_TIMESTAMP) {
+      res.status(400).send({
+        message: 'Error: timestamp before block 1.',
+        code: 400,
+      });
+      return;
+    }
 
     let block;
     switch (params.method || 'BINARY_SEARCH') {
