@@ -227,3 +227,12 @@ Time:        13.808 s, estimated 16 s
 Ran all test suites.
 ✨  Done in 14.33s.
 ```
+
+## TODO
+
+To improve this project here is a list of nice feature to have.
+
+- a working CI/CD with circle.
+- some cloud deployment code.
+- some Code coverage scripts.
+- a nice swagger for the documentation.
