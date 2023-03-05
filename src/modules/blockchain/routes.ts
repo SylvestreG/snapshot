@@ -1,5 +1,5 @@
 import { Express } from 'express';
-import { blockController } from './controller/block_controller';
+import { blockController } from 'modules/blockchain/controller/block_controller';
 
 export const registerRoutes = (app: Express) => {
   app.get('/block/height', blockController.blockHeight);

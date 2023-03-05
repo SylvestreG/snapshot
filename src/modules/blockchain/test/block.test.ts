@@ -3,6 +3,8 @@ import * as supertest from 'supertest';
 const request = require('supertest');
 
 describe('blockchain » block', () => {
+  jest.setTimeout(10000);
+
   it('Last height work', async () => {
     const app = await getApp(true);
     await request(app)

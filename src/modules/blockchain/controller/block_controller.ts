@@ -1,8 +1,8 @@
 import { Request, Response } from 'express';
-import { blockTimestampValidator } from '../validator/block_validator';
-import { BlockService } from '../services/block_service';
-import { TimestampTransformer } from '../transformer/timestamp_transformer';
-import { BlockTransformer } from '../transformer/block_transformer';
+import { blockTimestampValidator } from 'modules/blockchain/validator/block_validator';
+import { BlockService } from 'modules/blockchain/services/block_service';
+import { TimestampTransformer } from 'modules/blockchain/transformer/timestamp_transformer';
+import { BlockTransformer } from 'modules/blockchain/transformer/block_transformer';
 
 const FIRST_BLOCK_TIMESTAMP = 1438269988;
 

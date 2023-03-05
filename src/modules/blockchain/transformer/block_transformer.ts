@@ -1,5 +1,5 @@
 import { ethers } from 'ethers';
-import { TimestampResponse, TimestampTransformer } from './timestamp_transformer';
+import { TimestampResponse, TimestampTransformer } from 'modules/blockchain/transformer/timestamp_transformer';
 
 interface BlockResponse {
   rawBlock: ethers.providers.Block;

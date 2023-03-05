@@ -1,7 +1,6 @@
 import { ethers } from 'ethers';
 import BigNumber from 'bignumber.js';
-import { logger } from 'core/logger/logger';
-import { Cached } from '../../../core/cache';
+import { Cached } from 'core/cache';
 
 const AVG_BLOCK_TIME = 13;
 
@@ -43,13 +42,12 @@ export class BlockService {
     return this.client.getBlock(block);
   }
 
-  private findAvgTime(blockA: ethers.providers.Block, blockB: ethers.providers.Block): BigNumber {
+  static findAvgTime(blockA: ethers.providers.Block, blockB: ethers.providers.Block): BigNumber {
     const maxBlock = new BigNumber(Math.max(blockA.number, blockB.number));
     const minBlock = new BigNumber(Math.min(blockA.number, blockB.number));
     const maxTs = new BigNumber(Math.max(blockA.timestamp, blockB.timestamp));
     const minTs = new BigNumber(Math.min(blockA.timestamp, blockB.timestamp));
 
-    logger.debug(maxBlock.toString(), ' - ', minBlock.toString(), ' / ', maxTs.toString(), ' - ', minTs.toString());
     return maxTs.minus(minTs).dividedBy(maxBlock.minus(minBlock));
   }
 
@@ -83,8 +81,6 @@ export class BlockService {
 
     const deltaBlock = +new BigNumber(deltaSecond).dividedBy(avgTime).toFixed(0);
 
-    logger.debug('ds', deltaSecond, 'db', deltaBlock);
-
     let newBlockNumber;
     if (up) {
       newBlockNumber = block.number - deltaBlock;
@@ -94,8 +90,7 @@ export class BlockService {
     }
 
     const newBlock = await this.getBlock(newBlockNumber);
-    avgTime = this.findAvgTime(block, newBlock);
-    logger.debug('new block ', newBlockNumber, '( ', avgTime.toString(), 's/block)');
+    avgTime = BlockService.findAvgTime(block, newBlock);
 
     if (newBlockNumber !== block.number) {
       return this.lookingForBlockAvg(newBlock, timestamp, avgTime, nbLookup);
